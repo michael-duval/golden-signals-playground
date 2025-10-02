@@ -9,6 +9,7 @@ import (
 	"golden-signals-playground/internal/server"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Mount("/", server.Routes(s))
+	r.Mount("/metrics", promhttp.Handler())
 
 	srv := &http.Server{
 		Addr:              addr,

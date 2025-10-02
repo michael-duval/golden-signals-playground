@@ -1,6 +1,11 @@
 package server
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+)
 
 var (
 	reqs = prometheus.NewCounterVec(
@@ -8,15 +13,15 @@ var (
 			Name: "http_requests_total",
 			Help: "Total HTTP requests processed, labeled by status code and HTTP route.",
 		},
-		[]string{"route", "code"},
+		[]string{"method", "code"},
 	)
 	latency = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "http_request_duration_seconds_bucket",
+			Name:    "http_request_duration_seconds",
 			Help:    "HTTP request latency in seconds.",
 			Buckets: prometheus.DefBuckets,
 		},
-		[]string{"route"},
+		[]string{"method"},
 	)
 	inflight = prometheus.NewGauge(
 		prometheus.GaugeOpts{
@@ -28,4 +33,10 @@ var (
 
 func init() {
 	prometheus.MustRegister(reqs, latency, inflight)
+}
+
+func InstrumentedHandler(routeName string, h http.Handler) http.Handler {
+	return promhttp.InstrumentHandlerInFlight(inflight,
+		promhttp.InstrumentHandlerDuration(latency,
+			promhttp.InstrumentHandlerCounter(reqs, h)))
 }

@@ -9,6 +9,8 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
     ports: ["9090:9090"]
     networks: [obs]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   alertmanager:
     image: prom/alertmanager:v0.28.1
     container_name: alertmanager
@@ -22,6 +24,9 @@ services:
     volumes: 
       - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     ports: ["9115:9115"]
+    networks: [obs]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   grafana:
     image: grafana/grafana:12.2.0
     container_name: grafana

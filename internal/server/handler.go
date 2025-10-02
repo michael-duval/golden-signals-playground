@@ -16,8 +16,8 @@ func NewState() *State { return &State{LatencyMs: 50, FailPct: 0.00, Ready: 1, C
 
 func Routes(s *State) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", healthHandler)
-	mux.HandleFunc("/readyz", s.readyHandler)
+	mux.Handle("/healthz", InstrumentedHandler("healthz", http.HandlerFunc(healthHandler)))
+	mux.Handle("/readyz", InstrumentedHandler("readyz", http.HandlerFunc(s.readyHandler)))
 	return mux
 }
 
