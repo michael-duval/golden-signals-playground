@@ -1,0 +1,36 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.6.0
+    container_name: prometheus
+    volumes: 
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert-rules:/etc/prometheus/alert-rules:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports: ["9090:9090"]
+    networks: [obs]
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    container_name: alertmanager
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports: ["9093:9093"]
+    networks: [obs]
+  blackbox:
+    image: prom/blackbox-exporter:v0.27.0
+    container_name: blackbox
+    volumes: 
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    ports: ["9115:9115"]
+  grafana:
+    image: grafana/grafana:12.2.0
+    container_name: grafana
+    environment:
+      - GF_USERS_DEFAULT_THEME=dark
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports: ["3000:3000"]
+    networks: [obs]
+networks:
+  obs: {}

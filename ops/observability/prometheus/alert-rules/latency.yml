@@ -1,0 +1,13 @@
+groups:
+  - name: latency
+    rules:
+      - alert: P99LatencyTooHigh
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (le) (rate(http_request_duration_seconds_bucket[5m]))
+          ) > 0.4
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: "p99 latency > 400ms for 10m"
