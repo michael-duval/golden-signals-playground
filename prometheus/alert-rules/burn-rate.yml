@@ -1,0 +1,24 @@
+groups:
+  - name: error-budget
+    rules:
+      - alert: HighErrorRateFastBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{code=~"5.."}[5m])) /
+            sum(rate(http_requests_total[5m]))
+          ) / (1 - 0.995) > 10
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: "Fast burn rate (5m window)"
+      
+      - alert: HighErrorRateSlowBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{code=~"5.."}[30m])) /
+            sum(rate(http_requests_total[30m]))
+          ) / (1 - 0.995) > 2
+        for: 60m
+        labels: {severity: ticket}
+        annotations:
+          summary: "Slow burn rate (60m window)"
