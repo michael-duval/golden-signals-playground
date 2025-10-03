@@ -16,12 +16,12 @@ type State struct {
 	CpuMs     int64
 }
 
-func NewState() *State { return &State{LatencyMs: 50, FailPct: 0.00, Ready: 1} }
+func NewState() *State { return &State{LatencyMs: 65, FailPct: 0.00, Ready: 1} }
 
 func Routes(s *State) http.Handler {
 	mux := http.NewServeMux()
-	mux.Handle("/healthz", InstrumentedHandler("healthz", http.HandlerFunc(healthHandler)))
-	mux.Handle("/readyz", InstrumentedHandler("readyz", http.HandlerFunc(s.readyHandler)))
+	mux.Handle("/healthz", http.HandlerFunc(healthHandler))
+	mux.Handle("/readyz", http.HandlerFunc(s.readyHandler))
 	mux.Handle("/work", InstrumentedHandler("work", http.HandlerFunc(s.workHandler)))
 	return mux
 }

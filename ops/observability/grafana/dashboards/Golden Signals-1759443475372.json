@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 0,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -56,7 +56,7 @@
             },
             "showPoints": "auto",
             "showValues": false,
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -65,7 +65,9 @@
               "mode": "off"
             }
           },
+          "displayName": "p99",
           "mappings": [],
+          "noValue": "No Traffic",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -83,7 +85,7 @@
               }
             ]
           },
-          "unit": "ms"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -229,7 +231,8 @@
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
-              "type": "linear"
+              "log": 2,
+              "type": "symlog"
             },
             "showPoints": "auto",
             "showValues": false,
@@ -242,6 +245,7 @@
               "mode": "off"
             }
           },
+          "displayName": "error %",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -258,7 +262,32 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "error %"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 11,
@@ -284,7 +313,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "100 *\nsum(rate(http_requests_total{route=~\"$route\", code=~\"5..\"}[$__rate_interval])) \n/\nclamp_min(sum(rate(http_requests_total{route=~\"$route\"}[$__rate_interval])), 1e-9)\n",
+          "expr": "100 *\nsum(rate(http_requests_total{code=~\"5..\"}[1m])) \n/\nclamp_min(sum(rate(http_requests_total[1m])), 1e-9)\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -414,7 +443,7 @@
           "refId": "A"
         }
       ],
-      "title": "RPS",
+      "title": "Requests Per Second",
       "type": "timeseries"
     }
   ],
@@ -433,5 +462,5 @@
   "timezone": "browser",
   "title": "Golden Signals",
   "uid": "adn8jnb",
-  "version": 3
+  "version": 5
 }
